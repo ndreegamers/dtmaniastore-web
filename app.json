@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "compustore-web",
-    "slug": "compustore-web",
+    "name": "dtmaniaStore",
+    "slug": "dtmaniastore",
     "version": "1.0.0",
     "scheme": "compustore",
     "orientation": "portrait",

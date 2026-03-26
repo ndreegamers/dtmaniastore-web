@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import Head from 'expo/head';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
@@ -29,10 +30,15 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <>
+      <Head>
+        <title>dtmaniaStore</title>
+      </Head>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </>
   );
 }
