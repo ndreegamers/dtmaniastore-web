@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { lightTheme, type Theme } from '@/lib/theme';
 
@@ -70,6 +71,19 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
             )}
           </View>
         )}
+
+        {/* Social block */}
+        <View style={[styles.socialBlock, { justifyContent: isDesktop ? 'flex-end' : 'flex-start' }]}>
+          <TouchableOpacity activeOpacity={0.6}>
+            <FontAwesome5 name="instagram" size={22} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.6}>
+            <FontAwesome5 name="facebook" size={22} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.6}>
+            <FontAwesome5 name="discord" size={22} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Bottom strip */}
@@ -118,6 +132,12 @@ const styles = StyleSheet.create({
   contactItem: {
     fontSize: 13,
     lineHeight: 20,
+  },
+  socialBlock: {
+    flexDirection: 'row',
+    gap: 20,
+    alignItems: 'center',
+    paddingTop: 8,
   },
   bottomStrip: {
     borderTopWidth: 1,
