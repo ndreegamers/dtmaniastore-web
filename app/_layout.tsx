@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
-import Head from 'expo/head';
+import Head from 'expo-router/head';
 import * as SplashScreen from 'expo-splash-screen';
 import {
   useFonts,
