@@ -9,7 +9,12 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:dtmaniastore.pe)",
       "WebFetch(domain:vercel.com)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "mcp__playwright__browser_navigate",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8081)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_take_screenshot"
     ]
   },
   "enableAllProjectMcpServers": true,

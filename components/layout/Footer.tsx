@@ -59,6 +59,17 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
           <Text style={[styles.tagline, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
             Tu tienda de tecnología de confianza.
           </Text>
+          <View style={styles.socialBlock}>
+            <TouchableOpacity activeOpacity={0.6}>
+              <FontAwesome5 name="instagram" size={22} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.6}>
+              <FontAwesome5 name="facebook" size={22} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.6}>
+              <FontAwesome5 name="discord" size={22} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Sitemap block */}
@@ -99,18 +110,6 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
           </View>
         )}
 
-        {/* Social block */}
-        <View style={[styles.socialBlock, { justifyContent: isDesktop ? 'flex-end' : 'flex-start' }]}>
-          <TouchableOpacity activeOpacity={0.6}>
-            <FontAwesome5 name="instagram" size={22} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.6}>
-            <FontAwesome5 name="facebook" size={22} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.6}>
-            <FontAwesome5 name="discord" size={22} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
       </View>
 
       {/* Bottom strip */}
@@ -171,7 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 20,
     alignItems: 'center',
-    paddingTop: 8,
+    marginTop: 16,
   },
   bottomStrip: {
     borderTopWidth: 1,
