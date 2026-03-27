@@ -38,8 +38,8 @@ export default function CategoriaSlug() {
     (p) => p.is_active && p.category_id === category?.id
   );
 
-  const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
-  const gap = 14;
+  const cols = width >= 600 ? 4 : 2;
+  const gap = width >= 1024 ? 16 : width >= 600 ? 12 : 12;
   const cardWidth = (width - (cols + 1) * gap - (isDesktop ? 96 : 40)) / cols;
 
   const isLoading = loadingCats || loadingProducts;
