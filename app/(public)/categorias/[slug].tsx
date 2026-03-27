@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ export default function CategoriaSlug() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
+  const [gridWidth, setGridWidth] = useState(0);
   const { categories, loading: loadingCats, fetchCategories } = useCategories();
   const { products, loading: loadingProducts, fetchProducts } = useProducts();
 
@@ -38,11 +39,11 @@ export default function CategoriaSlug() {
     (p) => p.is_active && p.category_id === category?.id
   );
 
-  const horizontalPadding = isDesktop ? 48 : 20;
   const gap = width >= 1024 ? 16 : 12;
-  const availableWidth = width - horizontalPadding * 2;
   const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
-  const cardWidth = Math.max(0, (availableWidth - gap * (cols - 1)) / cols);
+  const cardWidth = gridWidth > 0
+    ? Math.max(0, (gridWidth - gap * (cols - 1)) / cols)
+    : 0;
 
   const isLoading = loadingCats || loadingProducts;
   const pageTitle = category ? `${category.name} — dtmaniaStore` : 'Categoría — dtmaniaStore';
@@ -53,7 +54,10 @@ export default function CategoriaSlug() {
       <Header theme={theme} />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.inner, { paddingHorizontal: isDesktop ? 48 : 20 }]}>
+        <View
+          style={[styles.inner, { paddingHorizontal: isDesktop ? 48 : 20 }]}
+          onLayout={(e) => setGridWidth(e.nativeEvent.layout.width)}
+        >
 
           {/* Breadcrumb */}
           <View style={styles.breadcrumb}>
