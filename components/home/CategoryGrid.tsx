@@ -74,10 +74,10 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
 
     const isDesktop = width >= 1024;
     const isTablet = width >= 768 && width < 1024;
-    const gap = isDesktop ? 32 : isTablet ? 24 : 14;
+    const gap = isDesktop ? 48 : isTablet ? 32 : 16;
     const horizontalPadding = isDesktop ? 60 : isTablet ? 32 : 16;
     const availableWidth = Math.min(width, 1200) - (horizontalPadding * 2);
-    const cols = isDesktop ? 4 : isTablet ? 2 : 2;
+    const cols = isDesktop ? 3 : isTablet ? 2 : 1;
     const cardWidth = Math.max(0, (availableWidth - (gap * (cols - 1))) / cols);
 
     return (
