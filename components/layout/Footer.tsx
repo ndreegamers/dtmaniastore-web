@@ -1,8 +1,20 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { lightTheme, type Theme } from '@/lib/theme';
+
+const SITEMAP = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Buscar productos', href: '/buscar' },
+  { label: 'Quiénes somos', href: '/nosotros' },
+  { label: 'Cómo comprar', href: '/como-comprar' },
+  { label: 'Garantías', href: '/garantias' },
+  { label: 'Contacto', href: '/contacto' },
+  { label: 'Política de privacidad', href: '/politica-de-privacidad' },
+  { label: 'Términos y condiciones', href: '/terminos-y-condiciones' },
+];
 
 interface FooterProps {
   theme?: Theme;
@@ -13,6 +25,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
   const isDesktop = width >= 1024;
   const currentYear = new Date().getFullYear();
   const { config, getConfig } = useSiteConfig();
+  const router = useRouter();
 
   useEffect(() => {
     getConfig();
@@ -46,6 +59,20 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
           <Text style={[styles.tagline, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
             Tu tienda de tecnología de confianza.
           </Text>
+        </View>
+
+        {/* Sitemap block */}
+        <View style={styles.sitemapBlock}>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted, fontFamily: theme.fonts.bodyMedium }]}>
+            MAPA DEL SITIO
+          </Text>
+          {SITEMAP.map((item) => (
+            <TouchableOpacity key={item.href} onPress={() => router.push(item.href as any)} activeOpacity={0.7}>
+              <Text style={[styles.sitemapLink, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Contact block */}
@@ -119,6 +146,13 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 14,
     lineHeight: 20,
+  },
+  sitemapBlock: {
+    gap: 8,
+  },
+  sitemapLink: {
+    fontSize: 13,
+    lineHeight: 22,
   },
   contactBlock: {
     gap: 8,
