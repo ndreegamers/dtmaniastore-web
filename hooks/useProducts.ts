@@ -8,13 +8,23 @@ interface CreateProductInput {
   description?: string;
   price: number;
   compare_price?: number | null;
-  category_id?: string | null;
+  category_ids?: string[];
   is_active?: boolean;
   is_featured?: boolean;
   sort_order?: number;
 }
 
-interface UpdateProductInput extends Partial<CreateProductInput> {}
+interface UpdateProductInput {
+  name?: string;
+  slug?: string;
+  description?: string;
+  price?: number;
+  compare_price?: number | null;
+  category_ids?: string[];
+  is_active?: boolean;
+  is_featured?: boolean;
+  sort_order?: number;
+}
 
 interface ImageInput {
   uri: string;           // local URI or already-uploaded URL
@@ -33,13 +43,36 @@ interface UseProductsReturn {
   deleteProduct: (id: string) => Promise<boolean>;
 }
 
+// -------------------------------------------------------
+// Helper: transforms raw Supabase row → Product with categories[]
+// -------------------------------------------------------
+function normalizeProduct(raw: any): Product {
+  const categories = (raw.product_categories ?? [])
+    .map((pc: any) => pc.categories)
+    .filter(Boolean);
+  const { product_categories, ...rest } = raw;
+  return { ...rest, categories } as Product;
+}
+
+// -------------------------------------------------------
+// Helper: sync product_categories pivot rows
+// -------------------------------------------------------
+async function syncProductCategories(productId: string, categoryIds: string[]) {
+  await supabase.from('product_categories').delete().eq('product_id', productId);
+  if (categoryIds.length > 0) {
+    await supabase.from('product_categories').insert(
+      categoryIds.map((catId) => ({ product_id: productId, category_id: catId }))
+    );
+  }
+}
+
 export function useProducts(): UseProductsReturn {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // -------------------------------------------------------
-  // Fetch all products (with primary image + category name)
+  // Fetch all products (with categories + images)
   // -------------------------------------------------------
   const fetchProducts = async () => {
     setLoading(true);
@@ -49,7 +82,7 @@ export function useProducts(): UseProductsReturn {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug),
+        product_categories(categories(id, name, slug)),
         images:product_images(*)
       `)
       .order('sort_order', { ascending: true });
@@ -57,7 +90,7 @@ export function useProducts(): UseProductsReturn {
     if (err) {
       setError(err.message);
     } else {
-      setProducts((data as Product[]) ?? []);
+      setProducts((data ?? []).map(normalizeProduct));
     }
     setLoading(false);
   };
@@ -70,7 +103,7 @@ export function useProducts(): UseProductsReturn {
       .from('products')
       .select(`
         *,
-        category:categories(id, name, slug),
+        product_categories(categories(id, name, slug)),
         images:product_images(*)
       `)
       .eq('id', id)
@@ -80,7 +113,7 @@ export function useProducts(): UseProductsReturn {
       setError(err.message);
       return null;
     }
-    return data as Product;
+    return normalizeProduct(data);
   };
 
   // -------------------------------------------------------
@@ -93,10 +126,8 @@ export function useProducts(): UseProductsReturn {
     for (let i = 0; i < Math.min(images.length, 5); i++) {
       const img = images[i];
 
-      // If the image already has a publicUrl it was uploaded by ImageUploader
       let publicUrl = img.publicUrl ?? '';
 
-      // If it's a local URI (not yet uploaded), upload now
       if (!publicUrl && img.uri) {
         const response = await fetch(img.uri);
         const blob = await response.blob();
@@ -107,7 +138,7 @@ export function useProducts(): UseProductsReturn {
           .from('products')
           .upload(filename, blob, { contentType: `image/${ext}`, upsert: false });
 
-        if (upErr) continue; // skip on error, don't block the product save
+        if (upErr) continue;
 
         const { data: urlData } = supabase.storage
           .from('products')
@@ -136,15 +167,16 @@ export function useProducts(): UseProductsReturn {
   ): Promise<Product | null> => {
     setError(null);
 
+    const { category_ids = [], ...productData } = input;
+
     const { data, error: err } = await supabase
       .from('products')
       .insert([{
-        ...input,
-        category_id: input.category_id ?? null,
-        compare_price: input.compare_price ?? null,
-        sort_order: input.sort_order ?? 0,
-        is_active: input.is_active ?? true,
-        is_featured: input.is_featured ?? false,
+        ...productData,
+        compare_price: productData.compare_price ?? null,
+        sort_order: productData.sort_order ?? 0,
+        is_active: productData.is_active ?? true,
+        is_featured: productData.is_featured ?? false,
       }])
       .select()
       .single();
@@ -155,13 +187,14 @@ export function useProducts(): UseProductsReturn {
     }
 
     const created = data as Product;
+    await syncProductCategories(created.id, category_ids);
     await uploadAndLinkImages(created.id, images);
-    await fetchProducts(); // refresh full list with images
+    await fetchProducts();
     return created;
   };
 
   // -------------------------------------------------------
-  // Update product (optionally replace images)
+  // Update product (optionally replace images and categories)
   // -------------------------------------------------------
   const updateProduct = async (
     id: string,
@@ -170,9 +203,11 @@ export function useProducts(): UseProductsReturn {
   ): Promise<Product | null> => {
     setError(null);
 
+    const { category_ids, ...productData } = input;
+
     const { data, error: err } = await supabase
       .from('products')
-      .update(input)
+      .update(productData)
       .eq('id', id)
       .select()
       .single();
@@ -182,9 +217,11 @@ export function useProducts(): UseProductsReturn {
       return null;
     }
 
-    // If new images array provided, replace existing
+    if (category_ids !== undefined) {
+      await syncProductCategories(id, category_ids);
+    }
+
     if (images && images.length > 0) {
-      // Delete old images rows (storage files remain, acceptable for MVP)
       await supabase.from('product_images').delete().eq('product_id', id);
       await uploadAndLinkImages(id, images);
     }
@@ -194,7 +231,7 @@ export function useProducts(): UseProductsReturn {
   };
 
   // -------------------------------------------------------
-  // Delete product (CASCADE removes product_images rows)
+  // Delete product (CASCADE removes product_images + product_categories)
   // -------------------------------------------------------
   const deleteProduct = async (id: string): Promise<boolean> => {
     setError(null);

@@ -144,7 +144,9 @@ export default function ProductosIndex() {
                   </View>
 
                   <Text style={[styles.category, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
-                    {(product.category as any)?.name ?? 'Sin categoría'}
+                    {product.categories && product.categories.length > 0
+                      ? product.categories.map((c) => c.name).join(', ')
+                      : 'Sin categoría'}
                   </Text>
 
                   <View style={styles.priceLine}>

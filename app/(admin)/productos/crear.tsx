@@ -17,7 +17,7 @@ export default function CrearProducto() {
       description: string;
       price: number;
       compare_price: number | null;
-      category_id: string | null;
+      category_ids: string[];
       is_active: boolean;
       is_featured: boolean;
     },

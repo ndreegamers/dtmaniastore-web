@@ -49,7 +49,7 @@ interface ProductFormProps {
       description: string;
       price: number;
       compare_price: number | null;
-      category_id: string | null;
+      category_ids: string[];
       is_active: boolean;
       is_featured: boolean;
     },
@@ -80,9 +80,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [isActive, setIsActive] = useState(editingProduct?.is_active ?? true);
   const [isFeatured, setIsFeatured] = useState(editingProduct?.is_featured ?? false);
 
-  // ---- Category ----
-  const [categoryId, setCategoryId] = useState<string | null>(
-    editingProduct?.category_id ?? null
+  // ---- Categories (multi-select) ----
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    editingProduct?.categories?.map((c) => c.id) ?? []
   );
   const { categories, fetchCategories } = useCategories();
 
@@ -174,7 +174,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           description: description.trim(),
           price: parseFloat(price),
           compare_price: comparePrice ? parseFloat(comparePrice) : null,
-          category_id: categoryId,
+          category_ids: categoryIds,
           is_active: isActive,
           is_featured: isFeatured,
         },
@@ -307,30 +307,35 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         theme={theme}
       />
 
-      {/* ── CATEGORÍA ── */}
-      <SectionLabel label="CATEGORÍA" theme={theme} />
+      {/* ── CATEGORÍAS ── */}
+      <SectionLabel label="CATEGORÍAS (puedes elegir varias)" theme={theme} />
 
       <View style={styles.categoryOptions}>
-        <Button
-          title="Sin categoría"
-          onPress={() => setCategoryId(null)}
-          variant={categoryId === null ? 'primary' : 'outline'}
-          theme={theme}
-          style={styles.catBtn}
-        />
         {categories
           .filter((c) => c.is_active)
-          .map((cat) => (
-            <Button
-              key={cat.id}
-              title={cat.name}
-              onPress={() => setCategoryId(cat.id)}
-              variant={categoryId === cat.id ? 'primary' : 'outline'}
-              theme={theme}
-              style={styles.catBtn}
-            />
-          ))}
+          .map((cat) => {
+            const selected = categoryIds.includes(cat.id);
+            return (
+              <Button
+                key={cat.id}
+                title={selected ? `✓ ${cat.name}` : cat.name}
+                onPress={() =>
+                  setCategoryIds((prev) =>
+                    selected ? prev.filter((id) => id !== cat.id) : [...prev, cat.id]
+                  )
+                }
+                variant={selected ? 'primary' : 'outline'}
+                theme={theme}
+                style={styles.catBtn}
+              />
+            );
+          })}
       </View>
+      {categoryIds.length === 0 && (
+        <Text style={[styles.hint, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
+          Sin categoría asignada.
+        </Text>
+      )}
 
       {/* ── OPCIONES ── */}
       <SectionLabel label="OPCIONES" theme={theme} />

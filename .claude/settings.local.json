@@ -8,11 +8,12 @@
       "Bash(git:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:dtmaniastore.pe)",
-      "WebFetch(domain:vercel.com)"
+      "WebFetch(domain:vercel.com)",
+      "Bash(npx tsc:*)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "playwright"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

@@ -36,7 +36,7 @@ export default function CategoriaSlug() {
   const category = categories.find((c) => c.slug === slug);
 
   const filtered: Product[] = products.filter(
-    (p) => p.is_active && p.category_id === category?.id
+    (p) => p.is_active && p.categories?.some((c) => c.id === category?.id)
   );
 
   const horizontalPadding = isDesktop ? 48 : 20;

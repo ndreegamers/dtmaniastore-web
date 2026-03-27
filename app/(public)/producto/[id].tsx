@@ -51,9 +51,13 @@ export default function ProductDetail() {
     })();
   }, [id]);
 
-  // Related products: same category, excluding current
+  // Related products: share at least one category with current product
+  const productCategoryIds = product?.categories?.map((c) => c.id) ?? [];
   const related = products.filter(
-    (p) => p.is_active && p.category_id === product?.category_id && p.id !== product?.id
+    (p) =>
+      p.is_active &&
+      p.id !== product?.id &&
+      p.categories?.some((c) => productCategoryIds.includes(c.id))
   ).slice(0, 4);
 
   const handleWhatsApp = async () => {
@@ -132,13 +136,13 @@ export default function ProductDetail() {
             <View style={styles.breadcrumb}>
               <Text onPress={() => router.push('/')} style={[styles.breadLink, { color: theme.colors.primary, fontFamily: theme.fonts.body }]}>Inicio</Text>
               <Text style={[styles.breadSep, { color: theme.colors.textMuted }]}> › </Text>
-              {product.category && (
+              {product.categories && product.categories.length > 0 && (
                 <>
                   <Text
-                    onPress={() => router.push(`/(public)/categorias/${(product.category as any).slug}` as any)}
+                    onPress={() => router.push(`/(public)/categorias/${product.categories![0].slug}` as any)}
                     style={[styles.breadLink, { color: theme.colors.primary, fontFamily: theme.fonts.body }]}
                   >
-                    {(product.category as any).name}
+                    {product.categories[0].name}
                   </Text>
                   <Text style={[styles.breadSep, { color: theme.colors.textMuted }]}> › </Text>
                 </>
@@ -156,11 +160,19 @@ export default function ProductDetail() {
 
           {/* ── Info Col ── */}
           <View style={[styles.infoCol, isDesktop && { flex: 1, paddingLeft: 48 }]}>
-            {/* Category badge */}
-            {product.category && (
-              <Text style={[styles.categoryBadge, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}>
-                {(product.category as any).name}
-              </Text>
+            {/* Category badges */}
+            {product.categories && product.categories.length > 0 && (
+              <View style={styles.categoryBadges}>
+                {product.categories.map((cat) => (
+                  <Text
+                    key={cat.id}
+                    onPress={() => router.push(`/(public)/categorias/${cat.slug}` as any)}
+                    style={[styles.categoryBadge, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}
+                  >
+                    {cat.name}
+                  </Text>
+                ))}
+              </View>
             )}
 
             {/* Name */}
@@ -274,6 +286,7 @@ const styles = StyleSheet.create({
   breadCurrent: { fontSize: 13, flexShrink: 1 },
   galleryCol: { width: '100%' },
   infoCol: { width: '100%', gap: 16 },
+  categoryBadges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   categoryBadge: { fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase' },
   productName: { fontSize: 26, letterSpacing: -0.5, lineHeight: 32 },
   priceBlock: { gap: 4 },

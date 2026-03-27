@@ -42,6 +42,7 @@ export interface Product {
   updated_at: string;
   images?: ProductImage[];
   category?: Category;
+  categories?: Category[];
 }
 
 export interface ProductImage {
