@@ -10,5 +10,9 @@
       "WebFetch(domain:dtmaniastore.pe)",
       "WebFetch(domain:vercel.com)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "enableAllProjectMcpServers": true
 }
