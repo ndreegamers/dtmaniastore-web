@@ -38,9 +38,11 @@ export default function CategoriaSlug() {
     (p) => p.is_active && p.category_id === category?.id
   );
 
-  const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
+  const horizontalPadding = isDesktop ? 48 : 20;
   const gap = width >= 1024 ? 16 : 12;
-  const cardWidth = (width - (cols + 1) * gap - (isDesktop ? 96 : 40)) / cols;
+  const availableWidth = width - horizontalPadding * 2;
+  const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
+  const cardWidth = Math.max(0, (availableWidth - gap * (cols - 1)) / cols);
 
   const isLoading = loadingCats || loadingProducts;
   const pageTitle = category ? `${category.name} — dtmaniaStore` : 'Categoría — dtmaniaStore';

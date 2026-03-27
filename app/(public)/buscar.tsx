@@ -52,9 +52,11 @@ export default function BuscarScreen() {
         );
       });
 
-  const cols = width >= 600 ? 4 : 2;
-  const gap = width >= 1024 ? 16 : width >= 600 ? 12 : 12;
-  const cardWidth = (width - (cols + 1) * gap - (isDesktop ? 96 : 40)) / cols;
+  const horizontalPadding = isDesktop ? 48 : 20;
+  const gap = width >= 1024 ? 16 : 12;
+  const availableWidth = width - horizontalPadding * 2;
+  const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
+  const cardWidth = Math.max(0, (availableWidth - gap * (cols - 1)) / cols);
 
   return (
     <View style={[styles.page, { backgroundColor: theme.colors.background }]}>
