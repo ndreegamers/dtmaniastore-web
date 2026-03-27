@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ls \"E:\\\\AntigravityProjects\\\\dtmaniastore-web\\\\app\\\\\\(public\\)\")",
+      "Bash(git:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dtmaniastore.pe)",
+      "WebFetch(domain:vercel.com)"
     ]
   }
 }

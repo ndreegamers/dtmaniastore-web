@@ -83,10 +83,6 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
     return (
         <View nativeID="seccion-categorias" style={{ width: '100%', backgroundColor: '#F5F5F7' }}>
             <View style={[styles.section, { paddingHorizontal: horizontalPadding }]}>
-                <Text style={[styles.heading, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
-                    Categorías
-                </Text>
-
                 <View style={[styles.grid, { gap }]}>
                     {rootCategories.map((cat) => (
                         <CategoryCard
@@ -109,12 +105,6 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
             maxWidth: 1200,
             alignSelf: 'center',
             width: '100%',
-        },
-        heading: {
-            fontSize: 26,
-            letterSpacing: -0.6,
-            marginBottom: 32,
-            textAlign: 'center',
         },
         grid: {
             flexDirection: 'row',

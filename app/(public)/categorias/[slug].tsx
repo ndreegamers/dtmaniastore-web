@@ -39,10 +39,11 @@ export default function CategoriaSlug() {
     (p) => p.is_active && p.category_id === category?.id
   );
 
+  const horizontalPadding = isDesktop ? 48 : 20;
   const gap = width >= 1024 ? 16 : 12;
   const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
   const cardWidth = gridWidth > 0
-    ? Math.max(0, (gridWidth - gap * (cols - 1)) / cols)
+    ? Math.max(0, (gridWidth - horizontalPadding * 2 - gap * (cols - 1)) / cols)
     : 0;
 
   const isLoading = loadingCats || loadingProducts;
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   catName: { fontSize: 28, letterSpacing: -0.5 },
   catDesc: { fontSize: 15, lineHeight: 22 },
   count: { fontSize: 13 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
   emptyState: { alignItems: 'center', paddingVertical: 60, gap: 12 },
   emptyIcon: { fontSize: 44 },
   emptyTitle: { fontSize: 18 },
