@@ -39,9 +39,10 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
       onPress={onPress}
       onHoverIn={onHoverIn}
       onHoverOut={onHoverOut}
-      style={[
+      style={({ pressed }) => [
         dropdownItemStyles.item,
         showDivider && { borderBottomWidth: 1, borderBottomColor: dividerColor },
+        { backgroundColor: 'transparent' },
       ]}
     >
       <Animated.View style={[dropdownItemStyles.bg, { backgroundColor }]} />
