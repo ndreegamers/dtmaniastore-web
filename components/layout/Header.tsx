@@ -195,6 +195,7 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
           activeOpacity={0.7}
           style={[
             styles.searchBtn,
+            !isDesktop && styles.searchBtnMobile,
             {
               backgroundColor: theme.colors.surface,
               borderColor: theme.colors.border,
@@ -204,12 +205,14 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
           accessibilityLabel="Buscar productos"
         >
           <Text style={[styles.searchIcon, { color: theme.colors.textMuted }]}>🔍</Text>
-          <Text
-            style={[styles.searchLabel, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}
-            numberOfLines={1}
-          >
-            {searchPlaceholder}
-          </Text>
+          {isDesktop && (
+            <Text
+              style={[styles.searchLabel, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}
+              numberOfLines={1}
+            >
+              {searchPlaceholder}
+            </Text>
+          )}
         </TouchableOpacity>
 
       </View>
@@ -289,7 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // Search — ancho ajustado al contenido del texto
+  // Search
   searchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -297,6 +300,11 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderWidth: 1,
+  },
+  // En móvil: solo icono, cuadrado
+  searchBtnMobile: {
+    paddingHorizontal: 12,
+    gap: 0,
   },
   searchIcon: {
     fontSize: 14,
