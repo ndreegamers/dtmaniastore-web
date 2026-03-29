@@ -9,17 +9,15 @@ import { lightTheme, type Theme } from '@/lib/theme';
 const SOCIAL = [
   {
     icon: 'instagram' as const,
-    username: '@dtmani4',
+    username: 'dtmani4',
     followers: '2.1K seguidores',
     url: 'https://www.instagram.com/dtmani4/',
-    color: '#E1306C',
   },
   {
     icon: 'facebook' as const,
-    username: '/DTMANIAST',
-    followers: '1.8K seguidores',
+    username: 'DTMANIAST',
+    followers: '149K seguidores',
     url: 'https://www.facebook.com/DTMANIAST',
-    color: '#1877F2',
   },
 ];
 
@@ -94,9 +92,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
                 activeOpacity={0.7}
                 style={styles.socialRow}
               >
-                <View style={[styles.socialIconWrap, { backgroundColor: s.color + '18' }]}>
-                  <FontAwesome5 name={s.icon} size={18} color={s.color} />
-                </View>
+                <FontAwesome5 name={s.icon} size={22} color={theme.colors.textSecondary} />
                 <View style={styles.socialInfo}>
                   <Text style={[styles.socialUsername, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
                     {s.username}
@@ -194,13 +190,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  socialIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   socialInfo: {
     gap: 2,
