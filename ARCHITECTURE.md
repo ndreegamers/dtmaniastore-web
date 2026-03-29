@@ -384,63 +384,59 @@ export interface CarouselSlide {
 
 ## 6. SISTEMA DE TEMAS (Dark/Light Mode)
 
+> **Actualizado Marzo 2026:** El proyecto usa **Sora** (encabezados) + **DM Sans** (cuerpo). Paleta refinada hacia azul slate profundo + sky blue accent.
+
 ```typescript
-// lib/theme.ts
-// Definir lightTheme y darkTheme con las siguientes variables:
+// lib/theme.ts — estado actual
 
 const lightTheme = {
   colors: {
     background: '#FFFFFF',
-    surface: '#F8F9FA',
-    surfaceHover: '#F1F3F5',
-    text: '#1A1A2E',
-    textSecondary: '#6C757D',
-    textMuted: '#ADB5BD',
-    primary: '#2563EB',
-    primaryHover: '#1D4ED8',
-    accent: '#7C3AED',
-    border: '#E5E7EB',
-    borderLight: '#F3F4F6',
+    surface: '#F8FAFC',           // Slate-50 frío
+    surfaceHover: '#F1F5F9',      // Slate-100
+    surfaceElevated: '#FFFFFF',
+    text: '#0F172A',              // Slate-900
+    textSecondary: '#475569',     // Slate-600
+    textMuted: '#94A3B8',         // Slate-400
+    primary: '#1A50D4',           // Azul profundo (era #2563EB)
+    primaryHover: '#1339B8',
+    accent: '#0EA5E9',            // Sky blue — tech (era morado #7C3AED)
+    border: '#E2E8F0',            // Slate-200
+    borderLight: '#F1F5F9',       // Slate-100
     success: '#10B981',
     warning: '#F59E0B',
     error: '#EF4444',
     overlay: 'rgba(0,0,0,0.5)',
   },
   fonts: {
-    heading: 'Inter_700Bold',
-    body: 'Inter_400Regular',
-    bodyMedium: 'Inter_500Medium',
+    heading: 'Sora_700Bold',          // Geométrica — encabezados H1/H2
+    headingSemi: 'Sora_600SemiBold',  // Precios, subtítulos importantes
+    body: 'DMSans_400Regular',        // Cuerpo de texto
+    bodyMedium: 'DMSans_500Medium',   // Labels, nombres de producto
   },
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    xxl: 48,
+    xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48,
   },
   borderRadius: {
-    sm: 6,
-    md: 10,
-    lg: 16,
-    full: 9999,
+    sm: 6, md: 10, lg: 16, xl: 24, full: 9999,
   },
 };
 
 const darkTheme = {
   ...lightTheme,
   colors: {
-    background: '#0F0F1A',
-    surface: '#1A1A2E',
-    surfaceHover: '#25253D',
-    text: '#F8F9FA',
-    textSecondary: '#ADB5BD',
-    textMuted: '#6C757D',
+    background: '#0A0F1E',
+    surface: '#111827',
+    surfaceHover: '#1F2937',
+    surfaceElevated: '#1F2937',
+    text: '#F1F5F9',
+    textSecondary: '#94A3B8',
+    textMuted: '#475569',
     primary: '#3B82F6',
     primaryHover: '#2563EB',
-    accent: '#8B5CF6',
-    border: '#2D2D44',
-    borderLight: '#1F1F35',
+    accent: '#38BDF8',
+    border: '#1E293B',
+    borderLight: '#0F172A',
     success: '#34D399',
     warning: '#FBBF24',
     error: '#F87171',
@@ -448,6 +444,22 @@ const darkTheme = {
   },
 };
 ```
+
+### Fuentes instaladas
+
+| Paquete | Tokens disponibles |
+|---|---|
+| `@expo-google-fonts/sora` | `Sora_700Bold`, `Sora_600SemiBold` |
+| `@expo-google-fonts/dm-sans` | `DMSans_400Regular`, `DMSans_500Medium`, `DMSans_700Bold` |
+
+### Patrones visuales establecidos (no cambiar sin alinear equipo)
+
+- **Hero Carousel:** Overlay gradiente `linear-gradient(to top, rgba(0,0,0,0.75), transparent)`. CTA usa `theme.colors.primary`.
+- **Category Cards:** Sombra `shadowOpacity: 0.07` + `borderRadius.xl`. Sin borde explícito.
+- **Product Cards:** Sombra `shadowOpacity: 0.06` + borde `theme.colors.border`. Precio en `headingSemi`.
+- **Category Badges (detalle):** Pills con `backgroundColor: '#EFF6FF'`, `borderColor: '#BFDBFE'`, texto en `primary`.
+- **Price Block (detalle):** Contenedor con `theme.colors.surface` + padding.
+- **Sección oscura (FeaturedProducts):** Fondo `#111827`, acento de línea en `theme.colors.accent`.
 
 ---
 
