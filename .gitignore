@@ -46,3 +46,7 @@ yarn-error.*
 # Playwright MCP
 .playwright-mcp/
 *.png
+
+# playwright-cli
+.playwright-cli/
+.claude/skills/playwright-cli/

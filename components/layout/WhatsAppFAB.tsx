@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Pressable,
   Text,
@@ -24,9 +24,13 @@ export const WhatsAppFAB: React.FC<WhatsAppFABProps> = ({
   productName,
   productUrl,
 }) => {
-  const { config } = useSiteConfig();
+  const { config, getConfig } = useSiteConfig();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+
+  useEffect(() => {
+    getConfig();
+  }, []);
 
   const handlePress = async () => {
     if (!config?.whatsapp_number) return;
@@ -46,17 +50,33 @@ export const WhatsAppFAB: React.FC<WhatsAppFABProps> = ({
     }
   };
 
-  if (!config?.whatsapp_number || !isDesktop) return null;
+  if (!config?.whatsapp_number) return null;
+
+  const webFixedStyle =
+    Platform.OS === 'web'
+      ? ({
+          position: 'fixed',
+          bottom: 28,
+          right: 24,
+          boxShadow: '0 4px 20px rgba(37,211,102,0.45)',
+          zIndex: 9999,
+        } as any)
+      : undefined;
 
   return (
     <Pressable
       onPress={handlePress}
-      style={({ hovered }) => [styles.fab, hovered && styles.fabHovered]}
+      style={({ hovered }) => [
+        styles.fab,
+        !isDesktop && styles.fabMobile,
+        webFixedStyle,
+        hovered && styles.fabHovered,
+      ]}
       accessibilityLabel="Contactar por WhatsApp"
       accessibilityRole="button"
     >
-      <FontAwesome5 name="whatsapp" size={20} color="#FFFFFF" />
-      <Text style={styles.label}>WhatsApp</Text>
+      <FontAwesome5 name="whatsapp" size={isDesktop ? 20 : 22} color="#FFFFFF" />
+      {isDesktop && <Text style={styles.label}>WhatsApp</Text>}
     </Pressable>
   );
 };
@@ -78,10 +98,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 8,
-    // On web use fixed positioning so the button stays in the viewport corner
-    ...(Platform.OS === 'web'
-      ? ({ position: 'fixed', boxShadow: '0 4px 20px rgba(37,211,102,0.45)', zIndex: 100 } as any)
-      : {}),
+  },
+  fabMobile: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
   },
   fabHovered: {
     backgroundColor: WA_GREEN_DARK,
