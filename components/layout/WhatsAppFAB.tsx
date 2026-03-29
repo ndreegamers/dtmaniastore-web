@@ -1,11 +1,13 @@
 import React from 'react';
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   StyleSheet,
   Platform,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { generateWhatsAppUrl } from '@/lib/utils/whatsapp';
 
@@ -23,6 +25,8 @@ export const WhatsAppFAB: React.FC<WhatsAppFABProps> = ({
   productUrl,
 }) => {
   const { config } = useSiteConfig();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   const handlePress = async () => {
     if (!config?.whatsapp_number) return;
@@ -42,20 +46,18 @@ export const WhatsAppFAB: React.FC<WhatsAppFABProps> = ({
     }
   };
 
-  if (!config?.whatsapp_number) return null;
+  if (!config?.whatsapp_number || !isDesktop) return null;
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
-      activeOpacity={0.85}
-      style={styles.fab}
+      style={({ hovered }) => [styles.fab, hovered && styles.fabHovered]}
       accessibilityLabel="Contactar por WhatsApp"
       accessibilityRole="button"
     >
-      {/* WhatsApp SVG-like icon via unicode */}
-      <Text style={styles.icon}>💬</Text>
+      <FontAwesome5 name="whatsapp" size={20} color="#FFFFFF" />
       <Text style={styles.label}>WhatsApp</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -81,8 +83,8 @@ const styles = StyleSheet.create({
       ? ({ boxShadow: '0 4px 20px rgba(37,211,102,0.45)' } as any)
       : {}),
   },
-  icon: {
-    fontSize: 18,
+  fabHovered: {
+    backgroundColor: WA_GREEN_DARK,
   },
   label: {
     color: '#FFFFFF',

@@ -9,6 +9,7 @@ import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { SkeletonHero, SkeletonCategoryCard, SkeletonProductCard } from '@/components/ui/Skeleton';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { lightTheme } from '@/lib/theme';
+import { WhatsAppFAB } from '@/components/layout/WhatsAppFAB';
 
 const SKELETON_COUNT = 8;
 
@@ -94,6 +95,7 @@ export default function HomePage() {
 
         <Footer theme={theme} />
       </ScrollView>
+      <WhatsAppFAB />
     </View>
   );
 }
