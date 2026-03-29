@@ -8,6 +8,10 @@ import {
   DMSans_500Medium,
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
+import {
+  Sora_600SemiBold,
+  Sora_700Bold,
+} from '@expo-google-fonts/sora';
 
 // Evita que la pantalla de carga se oculte antes de tener las fuentes listas
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +21,8 @@ export default function RootLayout() {
     DMSans_400Regular,
     DMSans_500Medium,
     DMSans_700Bold,
+    Sora_600SemiBold,
+    Sora_700Bold,
   });
 
   useEffect(() => {

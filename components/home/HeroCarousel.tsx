@@ -6,7 +6,8 @@ import {
   useWindowDimensions,
   TouchableOpacity,
   FlatList,
-  Image
+  Image,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCarousel } from '@/hooks/useCarousel';
@@ -67,6 +68,10 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ theme = lightTheme }
     );
   }
 
+  const gradientStyle = Platform.OS === 'web'
+    ? { background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)' } as any
+    : { backgroundColor: 'rgba(0,0,0,0.35)' };
+
   const renderItem = ({ item }: { item: CarouselSlide }) => {
     const imageUrl = width < 768 && item.image_url_mobile ? item.image_url_mobile : item.image_url;
 
@@ -78,19 +83,30 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ theme = lightTheme }
           <View style={[styles.slideImage, { backgroundColor: theme.colors.borderLight }]} />
         )}
 
-        {/* Sin overlay de opacidad */}
+        {/* Gradient overlay for text legibility */}
+        {(item.title || item.subtitle || item.link_url) && (
+          <View style={[styles.gradientOverlay, gradientStyle]} />
+        )}
 
         {(item.title || item.subtitle || item.link_url) && (
           <View style={[styles.content, { paddingHorizontal: width >= 1024 ? 80 : 24 }]}>
-            {item.title && <Text style={[styles.title, { fontFamily: theme.fonts.heading }]}>{item.title}</Text>}
-            {item.subtitle && <Text style={[styles.subtitle, { fontFamily: theme.fonts.body }]}>{item.subtitle}</Text>}
+            {item.title && (
+              <Text style={[styles.title, { fontFamily: theme.fonts.heading, fontSize: width >= 1024 ? 48 : 32 }]}>
+                {item.title}
+              </Text>
+            )}
+            {item.subtitle && (
+              <Text style={[styles.subtitle, { fontFamily: theme.fonts.body }]}>
+                {item.subtitle}
+              </Text>
+            )}
             {item.link_url && item.link_text && (
               <TouchableOpacity
                 onPress={() => router.push(item.link_url as any)}
                 activeOpacity={0.85}
-                style={[styles.cta, { backgroundColor: '#FFFFFF', borderRadius: theme.borderRadius.md }]}
+                style={[styles.cta, { backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.md }]}
               >
-                <Text style={[styles.ctaText, { color: '#1D1D1F', fontFamily: theme.fonts.bodyMedium }]}>
+                <Text style={[styles.ctaText, { fontFamily: theme.fonts.bodyMedium }]}>
                   {item.link_text}
                 </Text>
               </TouchableOpacity>
@@ -134,8 +150,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ theme = lightTheme }
                 style={[
                   styles.dot,
                   {
-                    backgroundColor: idx === activeIndex ? '#FFFFFF' : 'rgba(255,255,255,0.4)',
-                    width: idx === activeIndex ? 20 : 8,
+                    backgroundColor: idx === activeIndex ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
+                    width: idx === activeIndex ? 24 : 8,
                   },
                 ]}
               />
@@ -153,65 +169,63 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  slideContainer: {
-    flex: 1,
-  },
   slideImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  gradientOverlay: {
     ...StyleSheet.absoluteFillObject,
   },
   content: {
     position: 'absolute',
-    bottom: 56,
+    bottom: 64,
     left: 0,
     right: 0,
-    gap: 10,
+    gap: 12,
   },
   title: {
-    fontSize: 32,
     color: '#FFFFFF',
-    letterSpacing: -0.5,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
+    letterSpacing: -0.8,
+    lineHeight: 56,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.95)',
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
+    fontSize: 17,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 26,
   },
   cta: {
     alignSelf: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginTop: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    marginTop: 6,
   },
   ctaText: {
     color: '#FFFFFF',
     fontSize: 15,
+    letterSpacing: 0.2,
   },
   arrow: {
     position: 'absolute',
     top: '50%',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -22,
+    marginTop: -24,
   },
-  arrowLeft: { left: 16 },
-  arrowRight: { right: 16 },
+  arrowLeft: { left: 20 },
+  arrowRight: { right: 20 },
   arrowText: {
     color: '#FFFFFF',
-    fontSize: 28,
-    lineHeight: 32,
+    fontSize: 30,
+    lineHeight: 34,
   },
   dots: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 20,
     left: 0,
     right: 0,
     flexDirection: 'row',

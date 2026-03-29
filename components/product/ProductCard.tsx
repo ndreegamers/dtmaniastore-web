@@ -37,6 +37,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const hasDiscount = product.compare_price && product.compare_price > product.price;
+  const discountPct = hasDiscount
+    ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100)
+    : 0;
 
   return (
     <TouchableOpacity
@@ -45,24 +48,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       style={[
         styles.card,
         {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.borderLight,
+          backgroundColor: theme.colors.surfaceElevated,
+          borderColor: theme.colors.border,
           borderRadius: theme.borderRadius.lg,
         },
       ]}
     >
       {/* Image */}
-      <View style={[styles.imageWrap, { backgroundColor: theme.colors.borderLight, aspectRatio: imageAspectRatio }]}>
+      <View style={[styles.imageWrap, { backgroundColor: theme.colors.surface, aspectRatio: imageAspectRatio, borderTopLeftRadius: theme.borderRadius.lg, borderTopRightRadius: theme.borderRadius.lg }]}>
         {primaryImage ? (
           <Image source={{ uri: primaryImage }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Text style={styles.imagePlaceholder}>📷</Text>
+          <View style={styles.imagePlaceholderWrap}>
+            <Text style={[styles.imagePlaceholderIcon, { color: theme.colors.textMuted }]}>⬜</Text>
+          </View>
         )}
         {hasDiscount && (
           <View style={[styles.discountBadge, { backgroundColor: theme.colors.error }]}>
-            <Text style={styles.discountText}>
-              -{Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100)}%
-            </Text>
+            <Text style={styles.discountText}>-{discountPct}%</Text>
           </View>
         )}
       </View>
@@ -77,7 +80,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Text>
 
         <View style={styles.priceRow}>
-          <Text style={[styles.price, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}>
+          <Text style={[styles.price, { color: theme.colors.primary, fontFamily: theme.fonts.headingSemi }]}>
             S/ {product.price.toFixed(2)}
           </Text>
           {hasDiscount && (
@@ -95,6 +98,11 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     overflow: 'hidden',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   imageWrap: {
     width: '100%',
@@ -104,19 +112,20 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   image: { width: '100%', height: '100%' },
-  imagePlaceholder: { fontSize: 32 },
+  imagePlaceholderWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  imagePlaceholderIcon: { fontSize: 32, opacity: 0.3 },
   discountBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    paddingHorizontal: 6,
+    top: 10,
+    right: 10,
+    paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 6,
   },
   discountText: { color: '#fff', fontSize: 11, fontWeight: '700' },
-  info: { padding: 12, gap: 6 },
-  name: { fontSize: 13, lineHeight: 18 },
+  info: { padding: 14, gap: 6 },
+  name: { fontSize: 14, lineHeight: 20 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  price: { fontSize: 15 },
+  price: { fontSize: 16 },
   comparePrice: { fontSize: 12, textDecorationLine: 'line-through' },
 });

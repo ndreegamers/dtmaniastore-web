@@ -25,7 +25,6 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ theme = ligh
     const isDesktop = width >= 1024;
     const isTablet = width >= 768 && width < 1024;
     const horizontalPadding = isDesktop ? 60 : isTablet ? 32 : 16;
-    // Aumentamos a 340px para dar mayor altura y protagonismo
     const cardWidth = isDesktop ? 340 : isTablet ? 280 : width * 0.75;
     const gap = 24;
 
@@ -40,14 +39,18 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ theme = ligh
     };
 
     return (
-        <View style={{ width: '100%', backgroundColor: '#1D1D1F', position: 'relative' }}>
+        <View style={{ width: '100%', backgroundColor: '#111827', position: 'relative' }}>
             <View style={[styles.section, { paddingHorizontal: horizontalPadding }]}>
                 <View style={styles.sectionHeader}>
-                    {/* Título en blanco para contrastar con el fondo oscuro */}
-                    <Text style={[styles.heading, { color: '#FFFFFF', fontFamily: theme.fonts.heading }]}>
-                        Productos Destacados
-                    </Text>
-                    <View style={[styles.accent, { backgroundColor: theme.colors.primary }]} />
+                    <View>
+                        <Text style={[styles.heading, { color: '#FFFFFF', fontFamily: theme.fonts.heading }]}>
+                            Productos Destacados
+                        </Text>
+                        <Text style={[styles.subheading, { color: 'rgba(255,255,255,0.5)', fontFamily: theme.fonts.body }]}>
+                            Selección especial para ti
+                        </Text>
+                    </View>
+                    <View style={[styles.accent, { backgroundColor: theme.colors.accent }]} />
                 </View>
 
                 <View style={{ position: 'relative' }}>
@@ -67,18 +70,17 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ theme = ligh
                         ))}
                     </ScrollView>
 
-                    {/* Controles de navegación Desktop */}
                     {isDesktop && (
                         <>
-                            <TouchableOpacity 
-                                style={[styles.navArrow, { left: -24 }]} 
+                            <TouchableOpacity
+                                style={[styles.navArrow, { left: -24 }]}
                                 onPress={() => slide('left')}
                                 activeOpacity={0.8}
                             >
                                 <Text style={styles.arrowText}>‹</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity 
-                                style={[styles.navArrow, { right: -24 }]} 
+                            <TouchableOpacity
+                                style={[styles.navArrow, { right: -24 }]}
                                 onPress={() => slide('right')}
                                 activeOpacity={0.8}
                             >
@@ -94,21 +96,27 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ theme = ligh
 
 const styles = StyleSheet.create({
   section: {
-    paddingVertical: 60,
+    paddingTop: 56,
+    paddingBottom: 64,
     maxWidth: 1200,
     alignSelf: 'center',
     width: '100%',
   },
   sectionHeader: {
-    marginBottom: 32,
-    gap: 8,
+    marginBottom: 36,
+    gap: 12,
   },
   heading: {
-    fontSize: 26,
-    letterSpacing: -0.4,
+    fontSize: 28,
+    letterSpacing: -0.5,
+    marginBottom: 6,
+  },
+  subheading: {
+    fontSize: 15,
+    letterSpacing: 0.1,
   },
   accent: {
-    width: 40,
+    width: 36,
     height: 3,
     borderRadius: 2,
   },
@@ -126,14 +134,14 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
+      shadowOpacity: 0.2,
       shadowRadius: 8,
       elevation: 5,
       zIndex: 10,
   },
   arrowText: {
       fontSize: 28,
-      color: '#1D1D1F',
+      color: '#111827',
       lineHeight: 32,
       marginLeft: 2,
   },

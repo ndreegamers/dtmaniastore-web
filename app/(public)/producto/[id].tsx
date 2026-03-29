@@ -164,13 +164,16 @@ export default function ProductDetail() {
             {product.categories && product.categories.length > 0 && (
               <View style={styles.categoryBadges}>
                 {product.categories.map((cat) => (
-                  <Text
+                  <TouchableOpacity
                     key={cat.id}
                     onPress={() => router.push(`/(public)/categorias/${cat.slug}` as any)}
-                    style={[styles.categoryBadge, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}
+                    activeOpacity={0.7}
+                    style={[styles.categoryBadge, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}
                   >
-                    {cat.name}
-                  </Text>
+                    <Text style={[styles.categoryBadgeText, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}>
+                      {cat.name}
+                    </Text>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
@@ -181,7 +184,7 @@ export default function ProductDetail() {
             </Text>
 
             {/* Pricing */}
-            <View style={styles.priceBlock}>
+            <View style={[styles.priceBlock, { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md, padding: 16 }]}>
               <View style={styles.priceRow}>
                 <Text style={[styles.price, { color: theme.colors.primary, fontFamily: theme.fonts.heading }]}>
                   {currencySymbol} {product.price.toFixed(2)}
@@ -201,9 +204,11 @@ export default function ProductDetail() {
 
             {/* Description */}
             {product.description && (
-              <Text style={[styles.description, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
-                {product.description}
-              </Text>
+              <View style={[styles.descriptionBlock, { borderLeftColor: theme.colors.border }]}>
+                <Text style={[styles.description, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
+                  {product.description}
+                </Text>
+              </View>
             )}
 
             {/* WhatsApp CTA */}
@@ -226,9 +231,12 @@ export default function ProductDetail() {
         {/* ── Related Products ── */}
         {related.length > 0 && (
           <View style={[styles.relatedSection, { paddingHorizontal: isDesktop ? 48 : 20 }]}>
-            <Text style={[styles.relatedTitle, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
-              Productos relacionados
-            </Text>
+            <View style={styles.relatedHeader}>
+              <Text style={[styles.relatedTitle, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
+                Productos relacionados
+              </Text>
+              <View style={[styles.relatedAccent, { backgroundColor: theme.colors.primary }]} />
+            </View>
             <View style={[styles.relatedGrid, { gap: 14 }]}>
               {related.map((p) => {
                 const cols = width >= 1024 ? 4 : width >= 600 ? 3 : 2;
@@ -274,8 +282,8 @@ const styles = StyleSheet.create({
     maxWidth: 1280,
     alignSelf: 'center',
     width: '100%',
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingTop: 24,
+    paddingBottom: 48,
     gap: 24,
     flexWrap: 'wrap',
   },
@@ -285,33 +293,45 @@ const styles = StyleSheet.create({
   breadSep: { fontSize: 13 },
   breadCurrent: { fontSize: 13, flexShrink: 1 },
   galleryCol: { width: '100%' },
-  infoCol: { width: '100%', gap: 16 },
+  infoCol: { width: '100%', gap: 20 },
   categoryBadges: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  categoryBadge: { fontSize: 12, letterSpacing: 0.5, textTransform: 'uppercase' },
-  productName: { fontSize: 26, letterSpacing: -0.5, lineHeight: 32 },
-  priceBlock: { gap: 4 },
+  categoryBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 9999,
+    borderWidth: 1,
+  },
+  categoryBadgeText: { fontSize: 12, letterSpacing: 0.2 },
+  productName: { fontSize: 28, letterSpacing: -0.6, lineHeight: 36 },
+  priceBlock: { gap: 6 },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  price: { fontSize: 32, letterSpacing: -1 },
+  price: { fontSize: 34, letterSpacing: -1 },
   discountBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   discountText: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  comparePrice: { fontSize: 14, textDecorationLine: 'line-through' },
-  description: { fontSize: 15, lineHeight: 24 },
+  comparePrice: { fontSize: 14, textDecorationLine: 'line-through', marginTop: 2 },
+  descriptionBlock: {
+    borderLeftWidth: 3,
+    paddingLeft: 14,
+  },
+  description: { fontSize: 15, lineHeight: 26 },
   waButton: {
-    paddingVertical: 16,
+    paddingVertical: 17,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   waButtonText: { color: '#FFFFFF', fontSize: 16, letterSpacing: 0.2 },
   waHint: { fontSize: 12, textAlign: 'center' },
   relatedSection: {
-    paddingVertical: 40,
+    paddingVertical: 48,
     maxWidth: 1280,
     alignSelf: 'center',
     width: '100%',
-    gap: 20,
+    gap: 24,
   },
-  relatedTitle: { fontSize: 20, letterSpacing: -0.4 },
+  relatedHeader: { gap: 10 },
+  relatedTitle: { fontSize: 24, letterSpacing: -0.5 },
+  relatedAccent: { width: 32, height: 3, borderRadius: 2 },
   relatedGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   stickyWA: {
     padding: 12,

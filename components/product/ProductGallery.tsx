@@ -42,6 +42,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             height: mainSize,
             backgroundColor: theme.colors.surface,
             borderRadius: theme.borderRadius.lg,
+            borderColor: theme.colors.border,
           },
         ]}
       />
@@ -59,7 +60,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             height: mainSize,
             backgroundColor: theme.colors.surface,
             borderRadius: theme.borderRadius.lg,
-            borderColor: theme.colors.borderLight,
+            borderColor: theme.colors.border,
           },
         ]}
       >
@@ -77,7 +78,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.thumbRow, { gap: 8 }]}
+          contentContainerStyle={[styles.thumbRow, { gap: 10 }]}
         >
           {sorted.map((img, idx) => (
             <TouchableOpacity
@@ -87,10 +88,13 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
               style={[
                 styles.thumb,
                 {
-                  borderColor:
-                    idx === activeIndex ? theme.colors.primary : theme.colors.border,
+                  borderColor: idx === activeIndex ? theme.colors.primary : theme.colors.border,
                   borderRadius: theme.borderRadius.md,
                   backgroundColor: theme.colors.surface,
+                  shadowColor: '#0F172A',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: idx === activeIndex ? 0.12 : 0,
+                  shadowRadius: 6,
                 },
               ]}
             >
@@ -108,7 +112,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { gap: 12 },
+  container: { gap: 14 },
   mainWrap: {
     overflow: 'hidden',
     borderWidth: 1,
@@ -119,8 +123,8 @@ const styles = StyleSheet.create({
   emptyBox: { borderWidth: 1 },
   thumbRow: { paddingVertical: 2 },
   thumb: {
-    width: 72,
-    height: 72,
+    width: 76,
+    height: 76,
     overflow: 'hidden',
     borderWidth: 2,
   },

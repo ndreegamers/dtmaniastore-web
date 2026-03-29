@@ -20,7 +20,7 @@ const CategoryCard = ({ cat, cardWidth, theme, onPress }: any) => {
     const scaleValue = useRef(new Animated.Value(1)).current;
 
     const handleHoverIn = () => {
-        Animated.spring(scaleValue, { toValue: 1.03, friction: 8, tension: 40, useNativeDriver: true }).start();
+        Animated.spring(scaleValue, { toValue: 1.04, friction: 8, tension: 40, useNativeDriver: true }).start();
     };
     const handleHoverOut = () => {
         Animated.spring(scaleValue, { toValue: 1, friction: 8, tension: 40, useNativeDriver: true }).start();
@@ -38,7 +38,12 @@ const CategoryCard = ({ cat, cardWidth, theme, onPress }: any) => {
                 {
                     borderRadius: theme.borderRadius.xl,
                     backgroundColor: theme.colors.surfaceElevated,
-                    transform: [{ scale: scaleValue }]
+                    transform: [{ scale: scaleValue }],
+                    shadowColor: '#0F172A',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.07,
+                    shadowRadius: 16,
+                    elevation: 4,
                 }
             ]}>
                 {cat.image_url ? (
@@ -67,7 +72,6 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
     fetchCategories();
   }, []);
 
-  // Only root-level active categories
   const rootCategories = categories.filter((c) => c.is_active && c.parent_id === null);
 
   if (rootCategories.length === 0) return null;
@@ -81,8 +85,16 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
     const cardWidth = Math.max(0, (availableWidth - (gap * (cols - 1))) / cols);
 
     return (
-        <View nativeID="seccion-categorias" style={{ width: '100%', backgroundColor: '#F5F5F7' }}>
+        <View nativeID="seccion-categorias" style={{ width: '100%', backgroundColor: theme.colors.surface }}>
             <View style={[styles.section, { paddingHorizontal: horizontalPadding }]}>
+                {/* Section header */}
+                <View style={styles.sectionHeader}>
+                    <Text style={[styles.sectionTitle, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
+                        Categorías
+                    </Text>
+                    <View style={[styles.titleAccent, { backgroundColor: theme.colors.primary }]} />
+                </View>
+
                 <View style={[styles.grid, { gap }]}>
                     {rootCategories.map((cat) => (
                         <CategoryCard
@@ -99,40 +111,55 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({ theme = lightTheme }
     );
 };
 
-    const styles = StyleSheet.create({
-        section: {
-            paddingVertical: 60,
-            maxWidth: 1200,
-            alignSelf: 'center',
-            width: '100%',
-        },
-        grid: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-        },
-        card: {
-            alignItems: 'center',
-            gap: 16,
-            cursor: 'pointer',
-        },
-        imageWrap: {
-            width: '100%',
-            aspectRatio: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-        },
-        image: {
-            width: '100%',
-            height: '100%',
-        },
-        imagePlaceholder: {
-            fontSize: 40,
-        },
-        label: {
-            fontSize: 15,
-            textAlign: 'center',
-            marginTop: 2,
-        },
-    });
+const styles = StyleSheet.create({
+    section: {
+        paddingTop: 56,
+        paddingBottom: 64,
+        maxWidth: 1200,
+        alignSelf: 'center',
+        width: '100%',
+    },
+    sectionHeader: {
+        marginBottom: 40,
+        gap: 10,
+    },
+    sectionTitle: {
+        fontSize: 28,
+        letterSpacing: -0.5,
+    },
+    titleAccent: {
+        width: 36,
+        height: 3,
+        borderRadius: 2,
+    },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+    card: {
+        alignItems: 'center',
+        gap: 14,
+        cursor: 'pointer',
+    },
+    imageWrap: {
+        width: '100%',
+        aspectRatio: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    imagePlaceholder: {
+        fontSize: 40,
+    },
+    label: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 2,
+        letterSpacing: -0.1,
+    },
+});
