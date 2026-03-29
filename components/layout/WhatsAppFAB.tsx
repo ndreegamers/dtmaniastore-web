@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 8,
-    // Web-only shadow via boxShadow when supported
+    // On web use fixed positioning so the button stays in the viewport corner
     ...(Platform.OS === 'web'
-      ? ({ boxShadow: '0 4px 20px rgba(37,211,102,0.45)' } as any)
+      ? ({ position: 'fixed', boxShadow: '0 4px 20px rgba(37,211,102,0.45)', zIndex: 100 } as any)
       : {}),
   },
   fabHovered: {
