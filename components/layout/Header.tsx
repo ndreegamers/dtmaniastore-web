@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   Pressable,
-  Animated,
   StyleSheet,
   useWindowDimensions,
   Platform,
@@ -27,25 +26,15 @@ interface DropdownItemProps {
 const DropdownItem: React.FC<DropdownItemProps> = ({
   label, onPress, showDivider, hoverColor, dividerColor, textColor, fontFamily,
 }) => {
-  const bg = useRef(new Animated.Value(0)).current;
-
-  const onHoverIn = () => Animated.timing(bg, { toValue: 1, duration: 120, useNativeDriver: false }).start();
-  const onHoverOut = () => Animated.timing(bg, { toValue: 0, duration: 120, useNativeDriver: false }).start();
-
-  const backgroundColor = bg.interpolate({ inputRange: [0, 1], outputRange: ['rgba(0,0,0,0)', hoverColor] });
-
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={onHoverIn}
-      onHoverOut={onHoverOut}
-      style={({ pressed }) => [
+      style={({ hovered }) => [
         dropdownItemStyles.item,
         showDivider && { borderBottomWidth: 1, borderBottomColor: dividerColor },
-        { backgroundColor: 'transparent' },
+        { backgroundColor: hovered ? hoverColor : 'transparent', transition: 'background-color 120ms ease' } as any,
       ]}
     >
-      <Animated.View style={[dropdownItemStyles.bg, { backgroundColor }]} />
       <Text style={[dropdownItemStyles.text, { color: textColor, fontFamily }]}>
         {label}
       </Text>
@@ -59,9 +48,6 @@ const dropdownItemStyles = StyleSheet.create({
     paddingHorizontal: 18,
     position: 'relative',
     cursor: 'pointer' as any,
-  },
-  bg: {
-    ...StyleSheet.absoluteFillObject,
   },
   text: {
     fontSize: 14,
