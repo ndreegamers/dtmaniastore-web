@@ -31,6 +31,20 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
   // Cerrar dropdown al cambiar de ruta
   useEffect(() => { setDropdownOpen(false); }, [pathname]);
 
+  // Cerrar dropdown al hacer click fuera (web)
+  useEffect(() => {
+    if (!dropdownOpen || Platform.OS !== 'web') return;
+    const close = () => setDropdownOpen(false);
+    // Pequeño delay para que no se cierre inmediatamente por el mismo click que lo abrió
+    const timer = setTimeout(() => {
+      document.addEventListener('click', close, { once: true });
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', close);
+    };
+  }, [dropdownOpen]);
+
   const rootCategories = categories.filter((c) => c.is_active && c.parent_id === null);
 
   const handleCategoryPress = (slug: string) => {
@@ -49,15 +63,15 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
         {
           backgroundColor: theme.colors.background,
           borderBottomColor: theme.colors.border,
-          paddingHorizontal: isDesktop ? 48 : 20,
+          paddingHorizontal: isDesktop ? 60 : 20,
           zIndex: 200,
         },
       ]}
     >
-      <View style={[styles.inner, { maxWidth: 1280 }]}>
+      <View style={[styles.inner, { maxWidth: 1200 }]}>
 
         {/* Logo */}
-        <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.8}>
+        <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.8} style={styles.logoWrap}>
           <Text style={[styles.logo, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
             dtmania<Text style={{ color: theme.colors.primary }}>Store</Text>
           </Text>
@@ -66,7 +80,11 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
         {/* Categorías button + dropdown */}
         <View style={styles.categoriesWrapper}>
           <TouchableOpacity
-            onPress={() => setDropdownOpen((prev) => !prev)}
+            onPress={(e) => {
+              // Evitar que el click se propague al document listener
+              if (Platform.OS === 'web') (e as any).nativeEvent?.stopPropagation?.();
+              setDropdownOpen((prev) => !prev);
+            }}
             activeOpacity={0.85}
             style={[
               styles.categoriesBtn,
@@ -74,63 +92,52 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
             ]}
           >
             <Text style={[styles.categoriesBtnText, { fontFamily: theme.fonts.bodyMedium }]}>
-              {isDesktop ? 'Categorías' : 'Categorías'}{' '}
-              <Text style={styles.chevron}>{dropdownOpen ? '▲' : '▾'}</Text>
+              Categorías  {dropdownOpen ? '▲' : '▾'}
             </Text>
           </TouchableOpacity>
 
-          {/* Dropdown */}
+          {/* Dropdown — position absolute, no afecta al layout */}
           {dropdownOpen && (
-            <>
-              {/* Backdrop */}
-              <TouchableOpacity
-                style={styles.backdrop}
-                onPress={() => setDropdownOpen(false)}
-                activeOpacity={1}
-              />
-
-              {/* Lista */}
-              <View
-                style={[
-                  styles.dropdown,
-                  {
-                    backgroundColor: theme.colors.background,
-                    borderColor: theme.colors.border,
-                    borderRadius: theme.borderRadius.md,
-                    shadowColor: '#0F172A',
-                  },
-                ]}
-              >
-                {rootCategories.length === 0 ? (
-                  <Text style={[styles.dropdownEmpty, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
-                    Sin categorías
-                  </Text>
-                ) : (
-                  rootCategories.map((cat, index) => (
-                    <TouchableOpacity
-                      key={cat.id}
-                      onPress={() => handleCategoryPress(cat.slug)}
-                      activeOpacity={0.7}
-                      style={[
-                        styles.dropdownItem,
-                        index < rootCategories.length - 1 && {
-                          borderBottomWidth: 1,
-                          borderBottomColor: theme.colors.borderLight,
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.dropdownItemText, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
-                        {cat.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                )}
-              </View>
-            </>
+            <View
+              style={[
+                styles.dropdown,
+                {
+                  backgroundColor: theme.colors.background,
+                  borderColor: theme.colors.border,
+                  borderRadius: theme.borderRadius.md,
+                  shadowColor: '#0F172A',
+                },
+              ]}
+            >
+              {rootCategories.length === 0 ? (
+                <Text style={[styles.dropdownEmpty, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
+                  Sin categorías
+                </Text>
+              ) : (
+                rootCategories.map((cat, index) => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    onPress={() => handleCategoryPress(cat.slug)}
+                    activeOpacity={0.7}
+                    style={[
+                      styles.dropdownItem,
+                      index < rootCategories.length - 1 && {
+                        borderBottomWidth: 1,
+                        borderBottomColor: theme.colors.borderLight,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.dropdownItemText, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
+                      {cat.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
           )}
         </View>
 
-        {/* Search bar */}
+        {/* Search bar — flex:1, alineado con el ancho de la sección de categorías */}
         <TouchableOpacity
           onPress={() => router.push('/(public)/buscar' as any)}
           activeOpacity={0.7}
@@ -175,10 +182,12 @@ const styles = StyleSheet.create({
   },
 
   // Logo
+  logoWrap: {
+    marginRight: 16,
+  },
   logo: {
     fontSize: 22,
     letterSpacing: -0.5,
-    marginRight: 16,
   },
 
   // Categorías
@@ -191,30 +200,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     flexDirection: 'row',
     alignItems: 'center',
+    // minWidth fijo para que el chevron ▾/▲ no cause resize
+    minWidth: 130,
+    justifyContent: 'center',
   },
   categoriesBtnText: {
     color: '#FFFFFF',
     fontSize: 14,
     letterSpacing: 0.1,
   },
-  chevron: {
-    fontSize: 11,
-  },
 
-  // Dropdown
-  backdrop: {
-    position: 'fixed' as any,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 290,
-  },
+  // Dropdown — position absolute, no empuja al search bar
   dropdown: {
     position: 'absolute',
-    top: 44,
+    top: 46,
     left: 0,
-    minWidth: 200,
+    minWidth: 210,
     borderWidth: 1,
     zIndex: 400,
     shadowOffset: { width: 0, height: 8 },
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // Search
+  // Search — flex:1 dentro del espacio restante del inner (maxWidth 1200)
   searchBtn: {
     flex: 1,
     flexDirection: 'row',

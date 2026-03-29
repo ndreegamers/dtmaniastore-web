@@ -1,9 +1,27 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, Linking, Platform } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSiteConfig } from '@/hooks/useSiteConfig';
 import { lightTheme, type Theme } from '@/lib/theme';
+
+// ── Redes sociales — actualizar seguidores cuando cambien significativamente ──
+const SOCIAL = [
+  {
+    icon: 'instagram' as const,
+    username: '@dtmani4',
+    followers: '2.1K seguidores',
+    url: 'https://www.instagram.com/dtmani4/',
+    color: '#E1306C',
+  },
+  {
+    icon: 'facebook' as const,
+    username: '/DTMANIAST',
+    followers: '1.8K seguidores',
+    url: 'https://www.facebook.com/DTMANIAST',
+    color: '#1877F2',
+  },
+];
 
 const SITEMAP = [
   { label: 'Inicio', href: '/' },
@@ -27,14 +45,20 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
   const { config, getConfig } = useSiteConfig();
   const router = useRouter();
 
-  useEffect(() => {
-    getConfig();
-  }, []);
+  useEffect(() => { getConfig(); }, []);
 
   const siteName = config?.site_name ?? 'dtmaniaStore';
   const contactEmail = config?.contact_email;
   const contactPhone = config?.contact_phone;
   const address = config?.address;
+
+  const openLink = (url: string) => {
+    if (Platform.OS === 'web') {
+      window.open(url, '_blank');
+    } else {
+      Linking.openURL(url);
+    }
+  };
 
   return (
     <View
@@ -43,11 +67,12 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
         {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
-          paddingHorizontal: isDesktop ? 48 : 20,
+          paddingHorizontal: isDesktop ? 60 : 20,
         },
       ]}
     >
-      <View style={[styles.inner, { maxWidth: 1280, flexDirection: isDesktop ? 'row' : 'column' }]}>
+      <View style={[styles.inner, { maxWidth: 1200, flexDirection: isDesktop ? 'row' : 'column' }]}>
+
         {/* Brand block */}
         <View style={styles.brandBlock}>
           <Text style={[styles.brand, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
@@ -59,16 +84,29 @@ export const Footer: React.FC<FooterProps> = ({ theme = lightTheme }) => {
           <Text style={[styles.tagline, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>
             Tu tienda de tecnología de confianza.
           </Text>
+
+          {/* Redes sociales — icono + columna (usuario + seguidores) */}
           <View style={styles.socialBlock}>
-            <TouchableOpacity activeOpacity={0.6}>
-              <FontAwesome5 name="instagram" size={22} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.6}>
-              <FontAwesome5 name="facebook" size={22} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.6}>
-              <FontAwesome5 name="discord" size={22} color={theme.colors.textSecondary} />
-            </TouchableOpacity>
+            {SOCIAL.map((s) => (
+              <TouchableOpacity
+                key={s.icon}
+                onPress={() => openLink(s.url)}
+                activeOpacity={0.7}
+                style={styles.socialRow}
+              >
+                <View style={[styles.socialIconWrap, { backgroundColor: s.color + '18' }]}>
+                  <FontAwesome5 name={s.icon} size={18} color={s.color} />
+                </View>
+                <View style={styles.socialInfo}>
+                  <Text style={[styles.socialUsername, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
+                    {s.username}
+                  </Text>
+                  <Text style={[styles.socialFollowers, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
+                    {s.followers}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
@@ -146,6 +184,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+
+  // Redes sociales
+  socialBlock: {
+    marginTop: 20,
+    gap: 14,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  socialIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  socialInfo: {
+    gap: 2,
+  },
+  socialUsername: {
+    fontSize: 14,
+    letterSpacing: -0.1,
+  },
+  socialFollowers: {
+    fontSize: 12,
+  },
+
+  // Sitemap
   sitemapBlock: {
     gap: 8,
   },
@@ -153,6 +221,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 22,
   },
+
+  // Contact
   contactBlock: {
     gap: 8,
   },
@@ -166,12 +236,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
   },
-  socialBlock: {
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'center',
-    marginTop: 16,
-  },
+
+  // Bottom
   bottomStrip: {
     borderTopWidth: 1,
     paddingVertical: 16,
