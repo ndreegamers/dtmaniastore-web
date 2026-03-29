@@ -53,12 +53,29 @@ const CategoryCard = ({ cat, cardWidth, theme, onPress }: any) => {
                 )}
             </Animated.View>
 
-            <Text
-                style={[styles.label, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}
-                numberOfLines={2}
-            >
-                {cat.name}
-            </Text>
+            <View style={styles.cardInfo}>
+                <Text
+                    style={[styles.label, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}
+                    numberOfLines={2}
+                >
+                    {cat.name}
+                </Text>
+
+                {cat.description ? (
+                    <Text
+                        style={[styles.description, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}
+                        numberOfLines={3}
+                    >
+                        {cat.description}
+                    </Text>
+                ) : null}
+
+                <View style={styles.verMasRow}>
+                    <Text style={[styles.verMas, { color: theme.colors.primary, fontFamily: theme.fonts.bodyMedium }]}>
+                        Ver más →
+                    </Text>
+                </View>
+            </View>
         </Pressable>
     );
 };
@@ -139,8 +156,14 @@ const styles = StyleSheet.create({
     },
     card: {
         alignItems: 'center',
-        gap: 14,
+        gap: 0,
         cursor: 'pointer',
+    },
+    cardInfo: {
+        alignItems: 'center',
+        gap: 8,
+        paddingTop: 14,
+        width: '100%',
     },
     imageWrap: {
         width: '100%',
@@ -157,9 +180,23 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     label: {
-        fontSize: 16,
+        fontSize: 20,
+        fontWeight: '700',
         textAlign: 'center',
-        marginTop: 2,
-        letterSpacing: -0.1,
+        letterSpacing: -0.2,
+    },
+    description: {
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 20,
+        opacity: 0.85,
+    },
+    verMasRow: {
+        marginTop: 4,
+    },
+    verMas: {
+        fontSize: 14,
+        fontWeight: '600',
+        letterSpacing: 0.1,
     },
 });
