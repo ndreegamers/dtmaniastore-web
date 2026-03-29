@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
+  Pressable,
+  Animated,
   StyleSheet,
   useWindowDimensions,
   Platform,
@@ -10,6 +12,62 @@ import {
 import { useRouter, usePathname } from 'expo-router';
 import { useCategories } from '@/hooks/useCategories';
 import { lightTheme, type Theme } from '@/lib/theme';
+
+// ── Dropdown item con hover ──────────────────────────────────────────────────
+interface DropdownItemProps {
+  label: string;
+  onPress: () => void;
+  showDivider: boolean;
+  hoverColor: string;
+  dividerColor: string;
+  textColor: string;
+  fontFamily: string;
+}
+
+const DropdownItem: React.FC<DropdownItemProps> = ({
+  label, onPress, showDivider, hoverColor, dividerColor, textColor, fontFamily,
+}) => {
+  const bg = useRef(new Animated.Value(0)).current;
+
+  const onHoverIn = () => Animated.timing(bg, { toValue: 1, duration: 120, useNativeDriver: false }).start();
+  const onHoverOut = () => Animated.timing(bg, { toValue: 0, duration: 120, useNativeDriver: false }).start();
+
+  const backgroundColor = bg.interpolate({ inputRange: [0, 1], outputRange: ['rgba(0,0,0,0)', hoverColor] });
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onHoverIn={onHoverIn}
+      onHoverOut={onHoverOut}
+      style={[
+        dropdownItemStyles.item,
+        showDivider && { borderBottomWidth: 1, borderBottomColor: dividerColor },
+      ]}
+    >
+      <Animated.View style={[dropdownItemStyles.bg, { backgroundColor }]} />
+      <Text style={[dropdownItemStyles.text, { color: textColor, fontFamily }]}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+};
+
+const dropdownItemStyles = StyleSheet.create({
+  item: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    position: 'relative',
+    cursor: 'pointer' as any,
+  },
+  bg: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  text: {
+    fontSize: 14,
+    zIndex: 1,
+  },
+});
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface HeaderProps {
   theme?: Theme;
@@ -115,22 +173,16 @@ export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
                 </Text>
               ) : (
                 rootCategories.map((cat, index) => (
-                  <TouchableOpacity
+                  <DropdownItem
                     key={cat.id}
+                    label={cat.name}
                     onPress={() => handleCategoryPress(cat.slug)}
-                    activeOpacity={0.7}
-                    style={[
-                      styles.dropdownItem,
-                      index < rootCategories.length - 1 && {
-                        borderBottomWidth: 1,
-                        borderBottomColor: theme.colors.borderLight,
-                      },
-                    ]}
-                  >
-                    <Text style={[styles.dropdownItemText, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
-                      {cat.name}
-                    </Text>
-                  </TouchableOpacity>
+                    showDivider={index < rootCategories.length - 1}
+                    hoverColor={theme.colors.surfaceHover}
+                    dividerColor={theme.colors.borderLight}
+                    textColor={theme.colors.text}
+                    fontFamily={theme.fonts.bodyMedium}
+                  />
                 ))
               )}
             </View>
@@ -237,9 +289,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // Search — flex:1 dentro del espacio restante del inner (maxWidth 1200)
+  // Search — ancho ajustado al contenido del texto
   searchBtn: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -252,6 +303,5 @@ const styles = StyleSheet.create({
   },
   searchLabel: {
     fontSize: 14,
-    flex: 1,
   },
 });

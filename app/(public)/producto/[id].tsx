@@ -254,20 +254,6 @@ export default function ProductDetail() {
         <Footer theme={theme} />
       </ScrollView>
 
-      {/* Mobile sticky WhatsApp button */}
-      {!isDesktop && (
-        <View style={[styles.stickyWA, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>
-          <TouchableOpacity
-            onPress={handleWhatsApp}
-            activeOpacity={0.85}
-            style={[styles.waButton, { backgroundColor: WA_GREEN, borderRadius: theme.borderRadius.md, margin: 0 }]}
-          >
-            <Text style={[styles.waButtonText, { fontFamily: theme.fonts.bodyMedium }]}>
-              💬  Consultar por WhatsApp
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
@@ -333,8 +319,4 @@ const styles = StyleSheet.create({
   relatedTitle: { fontSize: 24, letterSpacing: -0.5 },
   relatedAccent: { width: 32, height: 3, borderRadius: 2 },
   relatedGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  stickyWA: {
-    padding: 12,
-    borderTopWidth: 1,
-  },
 });
