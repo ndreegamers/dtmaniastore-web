@@ -1,6 +1,14 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
+import { useCategories } from '@/hooks/useCategories';
 import { lightTheme, type Theme } from '@/lib/theme';
 
 interface HeaderProps {
@@ -9,95 +17,240 @@ interface HeaderProps {
   onScrollToSection?: (sectionId: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ theme = lightTheme, onScrollToTop, onScrollToSection }) => {
+export const Header: React.FC<HeaderProps> = ({ theme = lightTheme }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
-  const isCategoryPage = pathname.startsWith('/categorias');
 
-  const navLinks = [
-    { 
-      label: 'Inicio', 
-      isActive: pathname === '/',
-      disabled: false,
-      action: () => {
-        if (pathname === '/') {
-          onScrollToTop?.();
-        } else {
-          router.push('/');
-        }
-      } 
-    },
-    { 
-      label: 'Categorías', 
-      isActive: isCategoryPage,
-      disabled: isCategoryPage, // Deshabilita el botón si ya está en una categoría
-      action: () => {
-        if (pathname === '/') {
-          onScrollToSection?.('seccion-categorias');
-        } else if (!isCategoryPage) {
-          router.push('/');
-        }
-      } 
-    },
-  ];
+  const { categories, fetchCategories } = useCategories();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => { fetchCategories(); }, []);
+
+  // Cerrar dropdown al cambiar de ruta
+  useEffect(() => { setDropdownOpen(false); }, [pathname]);
+
+  const rootCategories = categories.filter((c) => c.is_active && c.parent_id === null);
+
+  const handleCategoryPress = (slug: string) => {
+    setDropdownOpen(false);
+    router.push(`/(public)/categorias/${slug}` as any);
+  };
+
+  const searchPlaceholder = isDesktop
+    ? 'Buscar laptops, monitores, teclados, componentes y más...'
+    : 'Buscar...';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background, borderBottomColor: theme.colors.border, paddingHorizontal: isDesktop ? 48 : 20 }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors.background,
+          borderBottomColor: theme.colors.border,
+          paddingHorizontal: isDesktop ? 48 : 20,
+          zIndex: 200,
+        },
+      ]}
+    >
       <View style={[styles.inner, { maxWidth: 1280 }]}>
+
+        {/* Logo */}
         <TouchableOpacity onPress={() => router.push('/')} activeOpacity={0.8}>
           <Text style={[styles.logo, { color: theme.colors.text, fontFamily: theme.fonts.heading }]}>
             dtmania<Text style={{ color: theme.colors.primary }}>Store</Text>
           </Text>
         </TouchableOpacity>
 
-        {isDesktop && (
-          <View style={styles.navLinks}>
-            {navLinks.map((link) => (
-              <TouchableOpacity 
-                key={link.label} 
-                activeOpacity={link.disabled ? 1 : 0.7} 
-                onPress={link.disabled ? undefined : link.action}
-                style={[{ cursor: link.disabled ? 'default' : 'pointer' } as any]}
-              >
-                <Text 
-                  style={[
-                    styles.navLink, 
-                    { 
-                      color: link.isActive ? theme.colors.primary : theme.colors.textSecondary, 
-                      fontFamily: link.isActive ? theme.fonts.bodyMedium : theme.fonts.body, 
-                      borderBottomColor: link.isActive ? theme.colors.primary : 'transparent',
-                      opacity: link.disabled && !link.isActive ? 0.5 : 1
-                    }
-                  ]}
-                >
-                  {link.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        <View style={styles.right}>
-          <TouchableOpacity onPress={() => router.push('/(public)/buscar' as any)} activeOpacity={0.7} style={[styles.iconBtn, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.borderRadius.md }]} accessibilityLabel="Buscar productos">
-            <Text style={styles.iconBtnText}>🔍</Text>
-            {isDesktop && <Text style={[styles.iconBtnLabel, { color: theme.colors.textSecondary, fontFamily: theme.fonts.body }]}>Buscar...</Text>}
+        {/* Categorías button + dropdown */}
+        <View style={styles.categoriesWrapper}>
+          <TouchableOpacity
+            onPress={() => setDropdownOpen((prev) => !prev)}
+            activeOpacity={0.85}
+            style={[
+              styles.categoriesBtn,
+              { backgroundColor: theme.colors.primary, borderRadius: theme.borderRadius.md },
+            ]}
+          >
+            <Text style={[styles.categoriesBtnText, { fontFamily: theme.fonts.bodyMedium }]}>
+              {isDesktop ? 'Categorías' : 'Categorías'}{' '}
+              <Text style={styles.chevron}>{dropdownOpen ? '▲' : '▾'}</Text>
+            </Text>
           </TouchableOpacity>
+
+          {/* Dropdown */}
+          {dropdownOpen && (
+            <>
+              {/* Backdrop */}
+              <TouchableOpacity
+                style={styles.backdrop}
+                onPress={() => setDropdownOpen(false)}
+                activeOpacity={1}
+              />
+
+              {/* Lista */}
+              <View
+                style={[
+                  styles.dropdown,
+                  {
+                    backgroundColor: theme.colors.background,
+                    borderColor: theme.colors.border,
+                    borderRadius: theme.borderRadius.md,
+                    shadowColor: '#0F172A',
+                  },
+                ]}
+              >
+                {rootCategories.length === 0 ? (
+                  <Text style={[styles.dropdownEmpty, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}>
+                    Sin categorías
+                  </Text>
+                ) : (
+                  rootCategories.map((cat, index) => (
+                    <TouchableOpacity
+                      key={cat.id}
+                      onPress={() => handleCategoryPress(cat.slug)}
+                      activeOpacity={0.7}
+                      style={[
+                        styles.dropdownItem,
+                        index < rootCategories.length - 1 && {
+                          borderBottomWidth: 1,
+                          borderBottomColor: theme.colors.borderLight,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.dropdownItemText, { color: theme.colors.text, fontFamily: theme.fonts.bodyMedium }]}>
+                        {cat.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                )}
+              </View>
+            </>
+          )}
         </View>
+
+        {/* Search bar */}
+        <TouchableOpacity
+          onPress={() => router.push('/(public)/buscar' as any)}
+          activeOpacity={0.7}
+          style={[
+            styles.searchBtn,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.borderRadius.md,
+            },
+          ]}
+          accessibilityLabel="Buscar productos"
+        >
+          <Text style={[styles.searchIcon, { color: theme.colors.textMuted }]}>🔍</Text>
+          <Text
+            style={[styles.searchLabel, { color: theme.colors.textMuted, fontFamily: theme.fonts.body }]}
+            numberOfLines={1}
+          >
+            {searchPlaceholder}
+          </Text>
+        </TouchableOpacity>
+
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { width: '100%', height: 64, borderBottomWidth: 1, justifyContent: 'center', zIndex: 100 },
-  inner: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', alignSelf: 'center', gap: 24 },
-  logo: { fontSize: 22, letterSpacing: -0.5 },
-  navLinks: { flex: 1, flexDirection: 'row', gap: 24 },
-  navLink: { fontSize: 14, borderBottomWidth: 2, paddingBottom: 2 },
-  right: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  iconBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1 },
-  iconBtnText: { fontSize: 15 },
-  iconBtnLabel: { fontSize: 13, minWidth: 70 },
+  container: {
+    width: '100%',
+    height: 64,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  inner: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 16,
+  },
+
+  // Logo
+  logo: {
+    fontSize: 22,
+    letterSpacing: -0.5,
+    marginRight: 16,
+  },
+
+  // Categorías
+  categoriesWrapper: {
+    position: 'relative',
+    zIndex: 300,
+  },
+  categoriesBtn: {
+    paddingVertical: 9,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoriesBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    letterSpacing: 0.1,
+  },
+  chevron: {
+    fontSize: 11,
+  },
+
+  // Dropdown
+  backdrop: {
+    position: 'fixed' as any,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 290,
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 44,
+    left: 0,
+    minWidth: 200,
+    borderWidth: 1,
+    zIndex: 400,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
+  dropdownItemText: {
+    fontSize: 14,
+  },
+  dropdownEmpty: {
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    fontSize: 13,
+  },
+
+  // Search
+  searchBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+  },
+  searchIcon: {
+    fontSize: 14,
+  },
+  searchLabel: {
+    fontSize: 14,
+    flex: 1,
+  },
 });
